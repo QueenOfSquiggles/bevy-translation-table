@@ -1,8 +1,21 @@
 [package]
-name = "bevy_translation_table"
+name = "bevy-translation-table"
 version = "0.1.0"
 edition = "2021"
+license = "MIT OR Apache-2.0"
+description = "A super basic translation table system for bevy supporting generic data, CSV, and ODS"
+homepage = "https://github.com/QueenOfSquiggles/bevy-translation-table"
+repository = "https://github.com/QueenOfSquiggles/bevy-translation-table"
+readme = "README.md"
 
+authors = ["QueenOfSquiggles <thequeenofsquiggles@gmail.com>"]
+keywords = ["bevy", "gamedev", "internationalization", "localization", "plugin"]
+categories = [
+    "game-development",
+    "games",
+    "internationalization",
+    "localization",
+]
 
 [dependencies]
 bevy_ecs = "0.13.2"                                       # only need knowledge of the ECS world, systems, and resource. Hence, smaller dependency

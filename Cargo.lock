@@ -151,6 +151,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "72b3254f16251a8381aa12e40e3c4d2f0199f8c6508fbecb9d91f575e0fbb8c6"
 
 [[package]]
+name = "bevy-translation-table"
+version = "0.1.0"
+dependencies = [
+ "bevy_device_lang",
+ "bevy_ecs",
+ "csv",
+ "spreadsheet-ods",
+]
+
+[[package]]
 name = "bevy_device_lang"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -255,16 +265,6 @@ dependencies = [
  "concurrent-queue",
  "futures-lite",
  "wasm-bindgen-futures",
-]
-
-[[package]]
-name = "bevy_translation_table"
-version = "0.1.0"
-dependencies = [
- "bevy_device_lang",
- "bevy_ecs",
- "csv",
- "spreadsheet-ods",
 ]
 
 [[package]]
