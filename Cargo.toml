@@ -17,6 +17,10 @@ categories = [
     "localization",
 ]
 
+exclude = [
+    # "assets/*" # asset needed for examples to work ? is there a decent workaround I can do?????
+]
+
 [dependencies]
 bevy_ecs = "0.13.2"                                       # only need knowledge of the ECS world, systems, and resource. Hence, smaller dependency
 bevy_device_lang = { version = "0.4.0", optional = true }
