@@ -6,6 +6,7 @@ use bevy_ecs::system::Resource;
 use spreadsheet_ods::CellContent;
 
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
+/// An enum describing the currently supported types of table storage, As well as some reference data for loading different columns
 pub enum TableFile {
     #[cfg(feature = "csv")]
     Csv(String),
@@ -16,6 +17,7 @@ pub enum TableFile {
     None,
 }
 #[derive(Clone, Debug, Default)]
+/// A helper struct for storing the two segments commonly used to denote a locale and region.
 pub struct LocaleCode {
     lang: String,
     region: String,
@@ -30,6 +32,7 @@ impl PartialEq for LocaleCode {
 
 impl LocaleCode {
     // TODO: make this overrideable.
+    /// The delimiter expected and produced when combining language and region codes in a LocalCode
     pub const REGION_DELIMITER: &'static str = "-";
 }
 
@@ -68,10 +71,11 @@ where
     }
 }
 
-#[derive(Resource, Clone, PartialEq, Debug)]
+#[derive(Clone, PartialEq, Debug, Resource)]
+/// The main Resource type that stores translation data.
 pub struct Translations {
-    pub locale: LocaleCode,
-    pub path: TableFile,
+    locale: LocaleCode,
+    path: TableFile,
     available_locales: Vec<LocaleCode>,
     mappings: HashMap<String, String>,
 }
@@ -88,6 +92,11 @@ impl Default for Translations {
 }
 
 impl Translations {
+    pub fn new() -> Self {
+        Self::default()
+    }
+    /// The short call to acquire a translation. Translations work through a key-value pair that are loaded based on the currently selected locale.
+    /// Here we specificially take a generic argument for the key such that any value that implements `ToString` can be translated. This creates a decent amount of flexibility for users as they will be able to "translate" custom types if they so choose.
     pub fn tr(&self, key: impl ToString) -> String {
         if let Some(value) = self.mappings.get(&key.to_string()).cloned() {
             value
@@ -103,6 +112,7 @@ impl Translations {
         }
     }
 
+    /// Modifies the current Translations data to load from a specified ODS file and load a particular locale.
     #[cfg(feature = "ods")]
     fn ods_file(&mut self, file: &Path, locale: &String) -> &mut Self {
         // note: remember that ODS (and any other spreadsheet) will index starting at 1, not 0!!
@@ -186,6 +196,7 @@ impl Translations {
         }
     }
 
+    /// Modifies the current Translations data to load from a specified CSV file and load a particular locale.
     #[cfg(feature = "csv")]
     pub fn csv_file(&mut self, path: &Path, locale: &String) -> &mut Self {
         let Ok(mut reader) = csv::ReaderBuilder::new()
@@ -233,6 +244,7 @@ impl Translations {
         self.data(locales.into_iter(), mapping.into_iter(), true)
     }
 
+    /// Modifies the current Translations data to load from a raw string in CSV format and load a particular locale.
     #[cfg(feature = "csv")]
     pub fn csv_raw(&mut self, csv_data: String, locale: &String) -> &mut Self {
         let mut reader = csv::ReaderBuilder::new()
@@ -277,6 +289,8 @@ impl Translations {
         self.data(locales.into_iter(), mapping.into_iter(), true)
     }
 
+    /// Modifies the current Translations data to load from raw data.
+    /// Note that using this method directly does not support changing locales. If you want that feature, you must use CSV or ODS
     pub fn data<S>(
         &mut self,
         locales: impl Iterator<Item = S>,
@@ -300,6 +314,7 @@ impl Translations {
         self
     }
 
+    /// A convenience method for calling `use_locale` with the system's default locale.
     #[cfg(feature = "auto")]
     pub fn use_system_locale(&mut self) -> &mut Self {
         self.use_locale(Self::get_system_language().unwrap_or(String::from(
@@ -307,6 +322,7 @@ impl Translations {
         )))
     }
 
+    /// Change the current locale to the new locale if available. Also loads the new mapping data allowing for translations to be loaded immediately.
     pub fn use_locale<S>(&mut self, locale: S) -> &mut Self
     where
         S: ToString + Clone,
@@ -343,9 +359,15 @@ impl Translations {
         }
     }
 
+    /// Returns an optional string if able to acquire the system's current locale code. Basically just a small wrapper around `bevy_device_lang` for convenience
     #[cfg(feature = "auto")]
     pub fn get_system_language() -> Option<String> {
         bevy_device_lang::get_lang()
+    }
+
+    /// Consumes and clones the instance to make inserting the resource into a bevy App or World a bit easier when using the builder pattern.
+    pub fn build(&self) -> Self {
+        self.clone() // probably not best practice :/
     }
 }
 
